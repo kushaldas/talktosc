@@ -82,14 +82,22 @@ pub fn sendapdu(card: &Card, apdu: apdus::APDU) -> Vec<u8> {
     return res;
 }
 
-pub fn entry() {
+pub fn entry(pin: Vec<u8>) {
     let card = create_connection().unwrap();
     //let select_openpgp: [u8; 11] = [0x00, 0xA4, 0x04, 0x00, 0x06, 0xD2, 0x76, 0x00, 0x01, 0x24, 0x01];
     let select_openpgp = apdus::create_apdu_select_openpgp();
     let resp = sendapdu(&card, select_openpgp);
     println!("Received Final: {:x?}", resp);
-    let get_url_apdu = apdus::create_apdu_get_url();
-    let resp = sendapdu(&card, get_url_apdu);
+    //let get_url_apdu = apdus::create_apdu_get_url();
+    //let resp = sendapdu(&card, get_url_apdu);
+    //let l = resp.len() - 2;
+    //println!(
+    //"Received at the end: {}",
+    //str::from_utf8(&resp[..l]).unwrap()
+    //);
+    // Now let us try to verify the pin passed to us.
+    let pin_apdu = apdus::create_apdu_verify_pw1_for_others(pin);
+    let resp = sendapdu(&card, pin_apdu);
     let l = resp.len() - 2;
     println!(
         "Received at the end: {}",
