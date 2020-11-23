@@ -1,14 +1,26 @@
+//! Module apdus helps to create new APDUs. We have many `create_*` functions to help to create
+//! predefined APDU structs.
+//!
+
 use std::fmt;
+
 /// Creates APDU to be used inside of our project.
 ///
 /// For now we have to use the raw u8 values to create a new APDU.
+/// It automatically creates internal `ipapdus` vector with chained APDUs as required based on the
+/// size of the data provided. Use [sendapdu](../fn.sendapdu.html) function to send an APDU to the
+/// connected card.
 #[derive(Clone)]
 pub struct APDU {
+    /// CLA information.
     pub cla: u8,
+    /// INS value
     pub ins: u8,
     pub p1: u8,
     pub p2: u8,
+    /// Original `Vec<u8>` data which needs to send to the card.
     pub data: Vec<u8>,
+    /// Chained APDUs in a vector. These are used internally in [sendapdu](../fn.sendapdu.html) function.
     pub iapdus: Vec<Vec<u8>>,
 }
 
@@ -97,6 +109,10 @@ impl<'a> Iterator for APDUIterator<'a> {
     }
 }
 
+/// Creates a new APDU to select the OpenPGP applet in the card.
+///
+/// This is the **first** APDU to be sent to the card. Only after selecting
+/// the OpenPGP applet, one should send in the other APDUs as required.
 pub fn create_apdu_select_openpgp() -> APDU {
     APDU::new(
         0x00,
@@ -105,4 +121,9 @@ pub fn create_apdu_select_openpgp() -> APDU {
         0x00,
         Some(vec![0xD2, 0x76, 0x00, 0x01, 0x24, 0x01]),
     )
+}
+
+/// Creates a new APDU to fetch the public key URL from the card
+pub fn create_apdu_get_url() -> APDU {
+    APDU::new(0x00, 0xCA, 0x5F, 0x50, None)
 }

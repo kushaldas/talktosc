@@ -1,9 +1,12 @@
+//! This crate defines APDUs and related functions to talk to the OpenPGP applet on a smartcard.
+//!
+//! Right now it is in the inital stage of the development.
 use pcsc::*;
 use std::str;
 
-mod apdus;
+pub mod apdus;
 
-pub use crate::apdus::*;
+//pub use crate::apdus::*;
 
 pub fn create_connection() -> Option<Card> {
     let ctx = match Context::establish(Scope::User) {
@@ -56,7 +59,7 @@ pub fn create_connection() -> Option<Card> {
 //return val;
 //}
 
-pub fn sendapdu(card: &Card, apdu: APDU) -> Vec<u8> {
+pub fn sendapdu(card: &Card, apdu: apdus::APDU) -> Vec<u8> {
     let l = apdu.iapdus.len();
     let mut i = 0;
     let mut res: Vec<u8> = Vec::new();
@@ -74,15 +77,13 @@ pub fn sendapdu(card: &Card, apdu: APDU) -> Vec<u8> {
     return res;
 }
 
-
-
 pub fn entry() {
     let card = create_connection().unwrap();
     //let select_openpgp: [u8; 11] = [0x00, 0xA4, 0x04, 0x00, 0x06, 0xD2, 0x76, 0x00, 0x01, 0x24, 0x01];
-    let select_openpgp = create_apdu_select_openpgp();
+    let select_openpgp = apdus::create_apdu_select_openpgp();
     let resp = sendapdu(&card, select_openpgp);
     println!("Received Final: {:x?}", resp);
-    let get_url_apdu = APDU::new(0x00, 0xCA, 0x5F, 0x50, None);
+    let get_url_apdu = apdus::create_apdu_get_url();
     let resp = sendapdu(&card, get_url_apdu);
     let l = resp.len() - 2;
     println!(
