@@ -6,9 +6,15 @@ use std::str;
 
 pub mod apdus;
 
-//pub use crate::apdus::*;
 
-pub fn create_connection() -> Option<Card> {
+/// Creates a new connection to the first reader and returns the connection, or `None`.
+///
+/// # Example
+///
+/// ```
+/// let card = create_connection().unwrap();
+/// ```
+pub fn create_connection() -> Option<Card>{
     let ctx = match Context::establish(Scope::User) {
         Ok(ctx) => ctx,
         Err(err) => {
