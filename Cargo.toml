@@ -8,3 +8,4 @@ edition = "2018"
 
 [dependencies]
 pcsc = "2.4.0"
+thiserror = "1.0"

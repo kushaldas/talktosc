@@ -5,22 +5,22 @@ use pcsc::*;
 use std::str;
 
 pub mod apdus;
+pub mod errors;
 
-
-/// Creates a new connection to the first reader and returns the connection, or `None`.
+/// Creates a new connection to the card attached to the first reader and returns the connection,
+/// or `None`.
 ///
 /// # Example
 ///
 /// ```
+/// use talktosc::*;
+///
 /// let card = create_connection().unwrap();
 /// ```
-pub fn create_connection() -> Option<Card>{
+pub fn create_connection() -> Result<Card, errors::TalktoSCError> {
     let ctx = match Context::establish(Scope::User) {
         Ok(ctx) => ctx,
-        Err(err) => {
-            eprintln!("Failed to establish context: {}", err);
-            std::process::exit(1);
-        }
+        Err(err) => return Err(errors::TalktoSCError::ContextError(err.to_string())),
     };
 
     // List available readers.
@@ -37,8 +37,7 @@ pub fn create_connection() -> Option<Card>{
     let reader = match readers.next() {
         Some(reader) => reader,
         None => {
-            println!("No readers are connected.");
-            return None;
+            return Err(errors::TalktoSCError::MissingReaderError);
         }
     };
     println!("Using reader: {:?}", reader);
@@ -47,15 +46,15 @@ pub fn create_connection() -> Option<Card>{
     let card = match ctx.connect(reader, ShareMode::Shared, Protocols::ANY) {
         Ok(card) => card,
         Err(Error::NoSmartcard) => {
-            println!("A smartcard is not present in the reader.");
-            return None;
+            return Err(errors::TalktoSCError::MissingSmartCardError);
         }
         Err(err) => {
-            eprintln!("Failed to connect to card: {}", err);
-            return None;
+            return Err(errors::TalktoSCError::SmartCardConnectionError(
+                err.to_string(),
+            ));
         }
     };
-    Some(card)
+    Ok(card)
 }
 
 //pub fn sendapdu(card: &Card, apdu: &[u8]) -> Vec<u8> {
@@ -109,7 +108,7 @@ mod tests {
         let mut f = File::open("./data/foo2.binary").expect("no file found");
         let mut buffer: Vec<u8> = Vec::new();
         f.read_to_end(&mut buffer).unwrap();
-        let comapdu = APDU::new(0x00, 0x2A, 0x80, 0x86, Some(buffer));
+        let comapdu = apdus::APDU::new(0x00, 0x2A, 0x80, 0x86, Some(buffer));
         assert_eq!(comapdu.iapdus.len(), 3);
         assert_eq!(comapdu.iapdus[0][0], 0x10);
         assert_eq!(comapdu.iapdus[1][0], 0x10);
