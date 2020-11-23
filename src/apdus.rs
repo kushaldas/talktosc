@@ -127,3 +127,9 @@ pub fn create_apdu_select_openpgp() -> APDU {
 pub fn create_apdu_get_url() -> APDU {
     APDU::new(0x00, 0xCA, 0x5F, 0x50, None)
 }
+
+/// Creates a new APDU to verify the PW1 for other commands. You should use this before trying to
+/// decrypt any data.
+pub fn create_apdu_verify_pw1_for_others(pin: Vec<u8>) -> APDU {
+    APDU::new(0x00, 0x20, 0x00, 0x82, Some(pin))
+}
