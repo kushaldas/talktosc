@@ -1,6 +1,9 @@
 use pcsc::*;
-use std::fmt;
 use std::str;
+
+mod apdus;
+
+pub use crate::apdus::*;
 
 pub fn create_connection() -> Option<Card> {
     let ctx = match Context::establish(Scope::User) {
@@ -71,115 +74,12 @@ pub fn sendapdu(card: &Card, apdu: APDU) -> Vec<u8> {
     return res;
 }
 
-/// Creates APDU to be used inside of our project.
-///
-/// For now we have to use the raw u8 values to create a new APDU.
-#[derive(Clone)]
-pub struct APDU {
-    cla: u8,
-    ins: u8,
-    p1: u8,
-    p2: u8,
-    data: Vec<u8>,
-    iapdus: Vec<Vec<u8>>,
-}
 
-impl fmt::Debug for APDU {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut start = String::from("[");
-        for iapdu in &self.iapdus {
-            let mut resp = String::from("[");
-            for value in iapdu {
-                let hex = format!("0x{:X?}, ", value);
-                resp.push_str(&hex[..]);
-            }
-            resp.push_str("]");
-            start.push_str(&resp[..]);
-        }
-        start.push_str("]");
-        f.debug_struct("APDU")
-            .field("CLA", &self.cla)
-            .field("INS", &self.ins)
-            .field("P1", &self.p1)
-            .field("P2", &self.p2)
-            .field("ipapdus", &start)
-            .finish()
-    }
-}
-
-impl APDU {
-    /// Creates a new APDU struct
-    pub fn new(cla: u8, ins: u8, p1: u8, p2: u8, inputdata: Option<Vec<u8>>) -> Self {
-        let mut index = 1;
-        let mut oindex = 0;
-        let mut _cindex = 0;
-        let data = match inputdata {
-            Some(data) => data,
-            None => vec![],
-        };
-        let length = data.len();
-        let mut iapdus = Vec::new();
-        while data.len() > index * 254 {
-            _cindex = index * 254;
-            let mut res = vec![0x10, ins, p1, p2, 254];
-            res.extend(data[oindex.._cindex].iter().copied());
-            iapdus.push(res);
-            index += 1;
-            oindex = _cindex;
-        }
-        let mut res = vec![cla, ins, p1, p2, (data.len() - oindex) as u8];
-        res.extend(data[oindex..length].iter().copied());
-        iapdus.push(res);
-        APDU {
-            cla,
-            ins,
-            p1,
-            p2,
-            data,
-            iapdus,
-        }
-    }
-}
-impl<'a> IntoIterator for &'a APDU {
-    type Item = Vec<u8>;
-    type IntoIter = APDUIterator<'a>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        APDUIterator {
-            apdu: self,
-            index: 0,
-        }
-    }
-}
-
-pub struct APDUIterator<'a> {
-    apdu: &'a APDU,
-    index: usize,
-}
-impl<'a> Iterator for APDUIterator<'a> {
-    type Item = Vec<u8>;
-    fn next(&mut self) -> Option<Vec<u8>> {
-        if self.index < self.apdu.iapdus.len() {
-            let res = self.apdu.iapdus[self.index].clone();
-            self.index += 1;
-            Some(res)
-        } else {
-            None
-        }
-    }
-}
 
 pub fn entry() {
     let card = create_connection().unwrap();
     //let select_openpgp: [u8; 11] = [0x00, 0xA4, 0x04, 0x00, 0x06, 0xD2, 0x76, 0x00, 0x01, 0x24, 0x01];
-    let select_openpgp = APDU::new(
-        0x00,
-        0xA4,
-        0x04,
-        0x00,
-        Some(vec![0xD2, 0x76, 0x00, 0x01, 0x24, 0x01]),
-    );
-
+    let select_openpgp = create_apdu_select_openpgp();
     let resp = sendapdu(&card, select_openpgp);
     println!("Received Final: {:x?}", resp);
     let get_url_apdu = APDU::new(0x00, 0xCA, 0x5F, 0x50, None);
