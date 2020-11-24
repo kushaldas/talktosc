@@ -9,7 +9,7 @@ pub mod errors;
 pub mod tlvs;
 
 /// Creates a new connection to the card attached to the first reader and returns the connection,
-/// or `None`.
+/// or the related error.
 ///
 /// # Example
 ///
