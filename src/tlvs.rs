@@ -42,6 +42,23 @@ impl TLV {
             true
         }
     }
+
+    /// Recursively (depth first) search for any given tag.
+    pub fn find_tag(&self, tag: u16) -> Option<TLV> {
+        if self.t == tag {
+            return Some(self.clone());
+        } else if self.if_recursive() {
+            for tlv in &self.subs {
+                let res = tlv.find_tag(tag);
+                match res {
+                    Some(res) => return Some(res),
+                    _ => (),
+                }
+
+            }
+        }
+        None
+    }
 }
 
 /// Internal function to pop a u8 value from the front of the vector.
@@ -51,9 +68,33 @@ fn get(mut data: Vec<u8>) -> (u8, Vec<u8>) {
 }
 
 /// Utility function to convert any u8 or u16 to hex String
+///
+/// # Example
+///
+/// ```
+/// println!(tlvs::hex(16));
+/// ```
 #[allow(unused)]
 pub fn hex<T: UpperHex>(value: T) -> String {
     format!("0x{:X}", value)
+}
+
+/// Utility function to convert the TLV.v values into a string of hex.
+///
+/// # Example
+///
+/// ```
+/// let t = big_box.find_tag(0xC1_u16).unwrap();
+/// println!("This card's SIGN algo {}", tlvs::hexify(t.v));
+/// ```
+pub fn hexify(value: Vec<u8>) -> String  {
+    let mut res = String::new();
+    for v in value.iter(){
+        let hvalue = hex(v);
+        res.push_str(" ");
+        res.push_str(&hvalue);
+    }
+    res
 }
 
 // I am returning (TLV, Vec<u8>) as I still have to figure if any data left to be read
