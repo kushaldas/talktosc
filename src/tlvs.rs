@@ -54,10 +54,38 @@ impl TLV {
                     Some(res) => return Some(res),
                     _ => (),
                 }
-
             }
         }
         None
+    }
+
+    /// Returns the Application identifier (AID), ISO 7816-4 bytes. Between 5-16 bytes in length.
+    pub fn get_aid(&self) -> Option<Vec<u8>> {
+        let tlv = self.find_tag(0x4F_u16)?;
+        Some(tlv.v.clone())
+    }
+
+    /// Returns the historical bytes from the smartcard
+    /// Most probably historical bytes will have more DOs inside as composite.
+    /// We will have to parse those manully into TLV structure.
+    pub fn get_historical_bytes(&self) -> Option<Vec<u8>> {
+        let tlv = self.find_tag(0x5F52)?;
+        Some(tlv.v.clone())
+    }
+
+    /// Returns the 60 bytes for the 3 fingerprints.
+    /// Signature, decryption, authentication
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// let sigdata = tlv.get_fingerprints().unwrap();
+    /// let sig_f = &sigdata[0..20];
+    /// println!("This card's Signature fingerprint {}", tlvs::hexify(sig_f.iter().cloned().collect()));
+    /// ```
+    pub fn get_fingerprints(&self) -> Option<Vec<u8>> {
+        let tlv = self.find_tag(0xC5)?;
+        Some(tlv.v.clone())
     }
 }
 
@@ -87,9 +115,9 @@ pub fn hex<T: UpperHex>(value: T) -> String {
 /// let t = big_box.find_tag(0xC1_u16).unwrap();
 /// println!("This card's SIGN algo {}", tlvs::hexify(t.v));
 /// ```
-pub fn hexify(value: Vec<u8>) -> String  {
+pub fn hexify(value: Vec<u8>) -> String {
     let mut res = String::new();
-    for v in value.iter(){
+    for v in value.iter() {
         let hvalue = hex(v);
         res.push_str(" ");
         res.push_str(&hvalue);
