@@ -133,3 +133,8 @@ pub fn create_apdu_get_url() -> APDU {
 pub fn create_apdu_verify_pw1_for_others(pin: Vec<u8>) -> APDU {
     APDU::new(0x00, 0x20, 0x00, 0x82, Some(pin))
 }
+
+/// Creates a new APDU to select the personal information from the card.
+pub fn create_apdu_personal_information() -> APDU {
+    APDU::new(0x00, 0xCA, 0x00, 0x65, None)
+}
