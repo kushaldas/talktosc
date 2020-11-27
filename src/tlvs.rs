@@ -87,6 +87,14 @@ impl TLV {
         let tlv = self.find_tag(0xC5)?;
         Some(tlv.v.clone())
     }
+
+    /// Returns the name of the card holder.
+    ///
+    /// Name according to ISO/IEC 7501-1
+    pub fn get_name(&self) -> Option<Vec<u8>> {
+        let tlv = self.find_tag(0x5B)?;
+        Some(tlv.v.clone())
+    }
 }
 
 /// Internal function to pop a u8 value from the front of the vector.
@@ -240,6 +248,14 @@ mod tests {
     use super::*;
     use std::fs::File;
     use std::io::Read;
+    fn get_my_tlv(filename: &str) -> TLV {
+        let mut f = File::open(filename).expect("no file found");
+        let mut buffer: Vec<u8> = Vec::new();
+        f.read_to_end(&mut buffer).unwrap();
+        let big_box = &read_list(buffer, true)[0];
+        big_box.clone()
+    }
+
     #[test]
     fn test_create_tlv() {
         // This is the test data from a Yubikey.
@@ -257,5 +273,12 @@ mod tests {
                 dbg!(tlv.if_recursive());
             }
         }
+    }
+
+    #[test]
+    fn test_parse_name_tlv() {
+        let big_box = get_my_tlv("./data/name.binary");
+        let tb = big_box.get_name().unwrap();
+        assert_eq!(String::from_utf8(tb).unwrap(), String::from("Das<<Kushal"));
     }
 }
