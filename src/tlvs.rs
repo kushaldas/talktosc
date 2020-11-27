@@ -80,7 +80,7 @@ impl TLV {
     ///
     /// ```
     /// let sigdata = tlv.get_fingerprints().unwrap();
-    /// let sig_f = &sigdata[0..20];
+    /// let sig_f, dec_f, auth_f = parse_fingerprints(sigdata);
     /// println!("This card's Signature fingerprint {}", tlvs::hexify(sig_f.iter().cloned().collect()));
     /// ```
     pub fn get_fingerprints(&self) -> Option<Vec<u8>> {
@@ -242,6 +242,18 @@ pub fn read_list(orig_data: Vec<u8>, recursive: bool) -> Vec<TLV> {
     result
 }
 
+/// Returns 3 fingerprints as 3 elecment Vec<u8>, (signature, decryption, authentication).
+pub fn parse_fingerprints(data: Vec<u8>) -> (Vec<u8>, Vec<u8>, Vec<u8>) {
+    let sig_f = &data[0..20];
+    let dec_f = &data[20..40];
+    let auth_f = &data[40..60];
+    return (
+        sig_f.iter().cloned().collect(),
+        dec_f.iter().cloned().collect(),
+        auth_f.iter().cloned().collect(),
+    );
+}
+
 #[cfg(test)]
 mod tests {
     // Note this useful idiom: importing names from outer (for mod tests) scope.
@@ -280,5 +292,26 @@ mod tests {
         let big_box = get_my_tlv("./data/name.binary");
         let tb = big_box.get_name().unwrap();
         assert_eq!(String::from_utf8(tb).unwrap(), String::from("Das<<Kushal"));
+    }
+
+    #[test]
+    fn test_parse_fingerprints() {
+        let hardcoded = (
+            vec![
+                11, 193, 53, 18, 94, 178, 255, 154, 15, 136, 238, 28, 198, 95, 240, 7, 199, 87,
+                102, 237,
+            ],
+            vec![
+                210, 186, 246, 33, 46, 76, 222, 84, 140, 51, 12, 61, 251, 130, 170, 93, 50, 109,
+                167, 93,
+            ],
+            vec![
+                98, 27, 19, 57, 205, 184, 49, 71, 154, 77, 235, 79, 124, 144, 242, 116, 158, 8, 94,
+                29,
+            ],
+        );
+        let big_box = get_my_tlv("./data/capabilities_tlv.binary");
+        let tlv = big_box.get_fingerprints().unwrap();
+        assert_eq!(hardcoded, parse_fingerprints(tlv));
     }
 }
