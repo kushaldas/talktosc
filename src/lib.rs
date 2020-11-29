@@ -1,12 +1,14 @@
 //! This crate defines APDUs and related functions to talk to the OpenPGP applet on a smartcard.
 //!
 //! Right now it is in the inital stage of the development.
+use apdus::APDU;
 use pcsc::*;
 use std::str;
 
 pub mod apdus;
 pub mod errors;
 pub mod tlvs;
+pub mod response;
 
 /// Creates a new connection to the card attached to the first reader and returns the connection,
 /// or the related error.
@@ -64,6 +66,8 @@ pub fn create_connection() -> Result<Card, errors::TalktoSCError> {
 //return val;
 //}
 
+/// Sends the given APDU (if required in chained way) to the card and returns the response as a
+/// vector of `u8`.
 pub fn sendapdu(card: &Card, apdu: apdus::APDU) -> Vec<u8> {
     let l = apdu.iapdus.len();
     let mut i = 0;
@@ -82,16 +86,21 @@ pub fn sendapdu(card: &Card, apdu: apdus::APDU) -> Vec<u8> {
     return res;
 }
 
+/// Helper function to send the APDU and returns the a Result<Response, errors::TalktoSCError>.
+pub fn send_and_parse(card: &Card, apdus: APDU) -> Result<response::Response, errors::TalktoSCError> {
+    response::Response::new(sendapdu(&card, apdus))
+}
+
 pub fn entry(pin: Vec<u8>) {
     let card = create_connection().unwrap();
     //let select_openpgp: [u8; 11] = [0x00, 0xA4, 0x04, 0x00, 0x06, 0xD2, 0x76, 0x00, 0x01, 0x24, 0x01];
     let select_openpgp = apdus::create_apdu_select_openpgp();
-    let resp = sendapdu(&card, select_openpgp);
-    println!("Received Final: {:x?}", resp);
+    let resp = send_and_parse(&card, select_openpgp).unwrap();
+    println!("Received Final: {:x?}", resp.get_data());
 
-    let resp = sendapdu(&card, apdus::create_apdu_get_aid());
+    let resp = send_and_parse(&card, apdus::create_apdu_get_aid()).unwrap();
 
-    println!("Serial number: {}", tlvs::parse_card_serial(resp));
+    println!("Serial number: {}", tlvs::parse_card_serial(resp.get_data()));
     //let get_url_apdu = apdus::create_apdu_get_url();
     //let resp = sendapdu(&card, get_url_apdu);
     //let l = resp.len() - 2;
