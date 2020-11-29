@@ -1,7 +1,7 @@
 //! This module implements ISO7816 TLV format.
 //!
 
-use std::fmt::UpperHex;
+use std::fmt::{format, UpperHex};
 
 /// A TLV contails the tag, and the length and also the value (data). Our implementation also
 /// contains a special `subs` attritbute, which contains a list of composite DOs.
@@ -103,6 +103,23 @@ impl TLV {
     /// Name according to ISO/IEC 7501-1
     pub fn get_name(&self) -> Option<Vec<u8>> {
         let tlv = self.find_tag(0x5B)?;
+        Some(tlv.v.clone())
+    }
+
+    /// Returns the bytes for the algorithm attritbutes of the Signature key
+    pub fn get_signature_algo_attributes(&self) -> Option<Vec<u8>> {
+        let tlv = self.find_tag(0xC1)?;
+        Some(tlv.v.clone())
+    }
+
+    /// Returns the bytes for the algorithm attritbutes of the encryption key
+    pub fn get_encryption_algo_attributes(&self) -> Option<Vec<u8>> {
+        let tlv = self.find_tag(0xC2)?;
+        Some(tlv.v.clone())
+    }
+    /// Returns the bytes for the algorithm attritbutes of the authentication key
+    pub fn get_authentication_algo_attributes(&self) -> Option<Vec<u8>> {
+        let tlv = self.find_tag(0xC3)?;
         Some(tlv.v.clone())
     }
 }
@@ -264,6 +281,15 @@ pub fn parse_fingerprints(data: Vec<u8>) -> (Vec<u8>, Vec<u8>, Vec<u8>) {
     );
 }
 
+/// Returns the serial number of the card from the AID response.
+pub fn parse_card_serial(data: Vec<u8>) -> String {
+    let mut res = String::new();
+    for i in 10..14 {
+        res.push_str(&format!("{:02X}", data[i]));
+    }
+    res
+}
+
 #[cfg(test)]
 mod tests {
     // Note this useful idiom: importing names from outer (for mod tests) scope.
@@ -276,6 +302,13 @@ mod tests {
         f.read_to_end(&mut buffer).unwrap();
         let big_box = &read_list(buffer, true)[0];
         big_box.clone()
+    }
+    // Helper function for tests
+    fn read_file(filename: &str) -> Vec<u8> {
+        let mut f = File::open(filename).expect("no file found");
+        let mut buffer: Vec<u8> = Vec::new();
+        f.read_to_end(&mut buffer).unwrap();
+        return buffer;
     }
 
     #[test]
@@ -323,5 +356,11 @@ mod tests {
         let big_box = get_my_tlv("./data/capabilities_tlv.binary");
         let tlv = big_box.get_fingerprints().unwrap();
         assert_eq!(hardcoded, parse_fingerprints(tlv));
+    }
+
+    #[test]
+    fn test_parse_card_serial_number() {
+        let data = read_file("./data/aid.binary");
+        assert_eq!(parse_card_serial(data), "14490729");
     }
 }
