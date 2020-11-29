@@ -138,3 +138,16 @@ pub fn create_apdu_verify_pw1_for_others(pin: Vec<u8>) -> APDU {
 pub fn create_apdu_personal_information() -> APDU {
     APDU::new(0x00, 0xCA, 0x00, 0x65, None)
 }
+
+/// Creates the APDU to get the AID (16 bytes) from the card.
+/// See the table 4.2.1 in the SPEC 3.4.1 pdf
+///
+/// # Example
+///
+/// ```
+/// let resp = sendapdu(&card, apdus::create_apdu_get_aid());
+/// println!("Serial number: {}", tlvs::parse_card_serial(resp));
+/// ```
+pub fn create_apdu_get_aid() -> APDU {
+    APDU::new(0x00, 0xCA, 0x00, 0x4F, None)
+}
