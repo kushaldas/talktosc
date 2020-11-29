@@ -29,8 +29,7 @@ pub fn create_connection() -> Result<Card, errors::TalktoSCError> {
     let mut readers = match ctx.list_readers(&mut readers_buf) {
         Ok(readers) => readers,
         Err(err) => {
-            eprintln!("Failed to list readers: {}", err);
-            std::process::exit(1);
+            return Err(errors::TalktoSCError::ReaderError(err.to_string()));
         }
     };
 
@@ -89,6 +88,10 @@ pub fn entry(pin: Vec<u8>) {
     let select_openpgp = apdus::create_apdu_select_openpgp();
     let resp = sendapdu(&card, select_openpgp);
     println!("Received Final: {:x?}", resp);
+
+    let resp = sendapdu(&card, apdus::create_apdu_get_aid());
+
+    println!("Serial number: {}", tlvs::parse_card_serial(resp));
     //let get_url_apdu = apdus::create_apdu_get_url();
     //let resp = sendapdu(&card, get_url_apdu);
     //let l = resp.len() - 2;
@@ -97,13 +100,13 @@ pub fn entry(pin: Vec<u8>) {
     //str::from_utf8(&resp[..l]).unwrap()
     //);
     // Now let us try to verify the pin passed to us.
-    let pin_apdu = apdus::create_apdu_verify_pw1_for_others(pin);
-    let resp = sendapdu(&card, pin_apdu);
-    let l = resp.len() - 2;
-    println!(
-        "Received at the end: {}",
-        str::from_utf8(&resp[..l]).unwrap()
-    );
+    //let pin_apdu = apdus::create_apdu_verify_pw1_for_others(pin);
+    //let resp = sendapdu(&card, pin_apdu);
+    //let l = resp.len() - 2;
+    //println!(
+    //"Received at the end: {}",
+    //str::from_utf8(&resp[..l]).unwrap()
+    //);
 }
 
 #[cfg(test)]
