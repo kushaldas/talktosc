@@ -21,4 +21,7 @@ pub enum TalktoSCError {
     /// When we can not connect to the smartcard.
     #[error("Failed to connect to the card: {0}")]
     SmartCardConnectionError(String),
+    /// Wrong sized data returned from the carc
+    #[error("Error in the response length: {0}")]
+    ResponseError(usize),
 }
