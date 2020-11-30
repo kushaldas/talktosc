@@ -92,7 +92,7 @@ impl TLV {
     ///
     /// This will be only availble under secure messaging, otherwise the transport layer can change
     /// the value.
-    /// Read 4.4.3.8 Key information section of the https://gnupg.org/ftp/specs/OpenPGP-smart-card-application-3.4.1.pdf
+    /// Read 4.4.3.8 Key information section of the <https://gnupg.org/ftp/specs/OpenPGP-smart-card-application-3.4.1.pdf>.
     pub fn get_key_information(&self) -> Option<Vec<u8>> {
         let tlv = self.find_tag(0xDE)?;
         Some(tlv.v.clone())
