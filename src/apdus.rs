@@ -156,3 +156,25 @@ pub fn create_apdu_get_aid() -> APDU {
 pub fn create_apdu_get_application_data() -> APDU {
     APDU::new(0x00, 0xCA, 0x00, 0x6E, None)
 }
+
+/// Creates new APDU only for reading more data from the card
+///
+/// Use this when the previous response is (0x61 length)
+pub fn create_apdu_for_reading(length: u8) -> APDU {
+    let cla = 0x00;
+    let ins = 0xC0;
+    let p1 = 0x00;
+    let p2 = 0x00;
+    let mut iapdus = Vec::new();
+    let res = vec![0x00, 0xC0, 0x00, 0x00, length];
+    iapdus.push(res);
+    let data: Vec<u8> = Vec::new();
+    APDU {
+        cla,
+        ins,
+        p1,
+        p2,
+        data,
+        iapdus,
+    }
+}
