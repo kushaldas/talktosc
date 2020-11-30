@@ -151,3 +151,8 @@ pub fn create_apdu_personal_information() -> APDU {
 pub fn create_apdu_get_aid() -> APDU {
     APDU::new(0x00, 0xCA, 0x00, 0x4F, None)
 }
+
+/// Creates a new APDU to get all the Application related data from the card
+pub fn create_apdu_get_application_data() -> APDU {
+    APDU::new(0x00, 0xCA, 0x00, 0x6E, None)
+}
