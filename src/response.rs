@@ -8,9 +8,9 @@ use crate::errors;
 #[allow(unused)]
 #[derive(Debug, Clone)]
 pub struct Response {
-    data: Vec<u8>,
-    sw1: u8,
-    sw2: u8,
+    pub data: Vec<u8>,
+    pub sw1: u8,
+    pub sw2: u8,
 }
 
 impl Response {
