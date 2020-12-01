@@ -42,7 +42,7 @@ pub fn create_connection() -> Result<Card, errors::TalktoSCError> {
             return Err(errors::TalktoSCError::MissingReaderError);
         }
     };
-    println!("Using reader: {:?}", reader);
+    //println!("Using reader: {:?}", reader);
 
     // Connect to the card.
     let card = match ctx.connect(reader, ShareMode::Shared, Protocols::ANY) {
@@ -76,7 +76,7 @@ pub fn sendapdu(card: &Card, apdu: apdus::APDU) -> Vec<u8> {
         let mut resp_buffer = [0; MAX_BUFFER_SIZE];
         let resp = card.transmit(&actual_apdu[..], &mut resp_buffer).unwrap();
         // TODO: Verify the response
-        println!("Received: {:#?}", resp);
+        //println!("Received: {:#?}", resp);
         i += 1;
         if i == l {
             // TODO: verify the final response
