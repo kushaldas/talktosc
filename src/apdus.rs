@@ -162,12 +162,6 @@ pub fn create_apdu_for_decryption(data: Vec<u8>) -> APDU {
     APDU::new(0x00, 0x2A, 0x80, 0x86, Some(data))
 }
 
-/// Creates new APDU for pin verification for decryption
-pub fn create_apdu_for_pin_verification_others(pin: Vec<u8>) -> APDU {
-    APDU::new(0x00, 0x20, 0x00, 0x82, Some(pin))
-}
-
-
 /// Creates new APDU only for reading more data from the card
 ///
 /// Use this when the previous response is (0x61 length)
