@@ -59,6 +59,11 @@ pub fn create_connection() -> Result<Card, errors::TalktoSCError> {
     Ok(card)
 }
 
+/// Disconnects the card via Disposition::LeaveCard
+pub fn disconnect(card: Card) {
+    let _ = card.disconnect(Disposition::LeaveCard);
+}
+
 //pub fn sendapdu(card: &Card, apdu: &[u8]) -> Vec<u8> {
 //let mut resp_buffer = [0; MAX_BUFFER_SIZE];
 //let resp = card.transmit(apdu, &mut resp_buffer).unwrap();
