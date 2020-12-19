@@ -5,7 +5,8 @@ use std::fmt::{format, UpperHex};
 
 /// A TLV contails the tag, and the length and also the value (data). Our implementation also
 /// contains a special `subs` attritbute, which contains a list of composite DOs.
-/// Read section  4.4.1 of OpenPGP-smart-card-application-3.4.1.pdf for more details on each tag.
+/// Read section  4.4.1 of [OpenPGP-smart-card-application-3.4.1.pdf](https://gnupg.org/ftp/specs/OpenPGP-smart-card-application-3.4.1.pdf)
+/// for more details on each tag.
 #[allow(unused)]
 #[derive(Debug, Clone)]
 pub struct TLV {
