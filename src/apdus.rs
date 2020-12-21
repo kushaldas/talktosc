@@ -79,6 +79,36 @@ impl APDU {
             iapdus,
         }
     }
+
+    ///Create big APDU with >255 size, say to put the keys.
+    pub fn create_big_apdu(cla: u8, ins: u8, p1: u8, p2: u8, data: Vec<u8>) -> Self {
+        let len = data.len() as u16;
+        let mut iapdus = Vec::new();
+        let mut res = vec![cla, ins, p1, p2];
+        // If the lenght is bigger than 255, then 3 bytes size
+        if len > 0xFF {
+            let length = len.to_be_bytes();
+            res.push(0x00);
+            res.push(length[0]);
+            res.push(length[1]);
+        } else {
+            let len = len as u8;
+            res.push(len);
+        }
+        res.extend(data.iter());
+        // We have only big APDU which we can send to the card
+        iapdus.push(res);
+
+        APDU {
+            cla,
+            ins,
+            p1,
+            p2,
+            data,
+            iapdus,
+        }
+
+    }
 }
 impl<'a> IntoIterator for &'a APDU {
     type Item = Vec<u8>;
@@ -132,6 +162,11 @@ pub fn create_apdu_get_url() -> APDU {
 /// decrypt any data.
 pub fn create_apdu_verify_pw1_for_others(pin: Vec<u8>) -> APDU {
     APDU::new(0x00, 0x20, 0x00, 0x82, Some(pin))
+}
+
+/// Creates a new APDU to verify the PW3 for admin commands.
+pub fn create_apdu_verify_pw3(pin: Vec<u8>) -> APDU {
+    APDU::new(0x00, 0x20, 0x00, 0x83, Some(pin))
 }
 
 /// Creates a new APDU to select the personal information from the card.
