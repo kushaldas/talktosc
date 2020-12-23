@@ -24,4 +24,7 @@ pub enum TalktoSCError {
     /// Wrong sized data returned from the carc
     #[error("Error in the response length: {0}")]
     ResponseError(usize),
+    /// Pin error
+    #[error("Faied to verify the pin")]
+    PinError,
 }
