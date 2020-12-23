@@ -164,6 +164,12 @@ pub fn create_apdu_verify_pw1_for_others(pin: Vec<u8>) -> APDU {
     APDU::new(0x00, 0x20, 0x00, 0x82, Some(pin))
 }
 
+/// Creates a new APDU to verify the PW1 for signing. You should use this before trying to
+/// sign any data.
+pub fn create_apdu_verify_pw1_for_sign(pin: Vec<u8>) -> APDU {
+    APDU::new(0x00, 0x20, 0x00, 0x81, Some(pin))
+}
+
 /// Creates a new APDU to verify the PW3 for admin commands.
 pub fn create_apdu_verify_pw3(pin: Vec<u8>) -> APDU {
     APDU::new(0x00, 0x20, 0x00, 0x83, Some(pin))
@@ -217,4 +223,9 @@ pub fn create_apdu_for_reading(length: u8) -> APDU {
         data,
         iapdus,
     }
+}
+
+/// Creates big APDU to put algorithm attributes data in to the card
+pub fn create_apdu_for_algo_attributes(data: Vec<u8>) -> APDU {
+    APDU::create_big_apdu(0x00, 0xDA, 0x00, 0xC2, data)
 }
