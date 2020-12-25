@@ -175,6 +175,12 @@ pub fn create_apdu_verify_pw3(pin: Vec<u8>) -> APDU {
     APDU::new(0x00, 0x20, 0x00, 0x83, Some(pin))
 }
 
+/// Creates a new APDU to change the PW1 pin.
+/// This can be used to reset the counter and set a pin.
+pub fn create_apdu_change_pw1(pin: Vec<u8>) -> APDU {
+    APDU::new(0x00, 0x2C, 0x02, 0x81, Some(pin))
+}
+
 /// Creates a new APDU to select the personal information from the card.
 pub fn create_apdu_personal_information() -> APDU {
     APDU::new(0x00, 0xCA, 0x00, 0x65, None)
