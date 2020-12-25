@@ -181,6 +181,13 @@ pub fn create_apdu_change_pw1(pin: Vec<u8>) -> APDU {
     APDU::new(0x00, 0x2C, 0x02, 0x81, Some(pin))
 }
 
+/// Creates a new APDU to change the PW3 admin pin
+pub fn create_apdu_change_pw3(pin: Vec<u8>, newpin: Vec<u8>) -> APDU {
+    let mut fullpin = pin.clone();
+    fullpin.extend(newpin.iter());
+    APDU::new(0x00, 0x24, 0x00, 0x83, Some(fullpin))
+}
+
 /// Creates a new APDU to select the personal information from the card.
 pub fn create_apdu_personal_information() -> APDU {
     APDU::new(0x00, 0xCA, 0x00, 0x65, None)
