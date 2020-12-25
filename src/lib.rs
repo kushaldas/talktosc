@@ -3,7 +3,6 @@
 //! Right now it is in the inital stage of the development.
 use apdus::APDU;
 use pcsc::*;
-use std::str;
 
 pub mod apdus;
 pub mod errors;
@@ -96,7 +95,7 @@ pub fn send_and_parse(card: &Card, apdus: APDU) -> Result<response::Response, er
     response::Response::new(sendapdu(&card, apdus))
 }
 
-pub fn entry(pin: Vec<u8>) {
+pub fn entry(_pin: Vec<u8>) {
     let card = create_connection().unwrap();
     //let select_openpgp: [u8; 11] = [0x00, 0xA4, 0x04, 0x00, 0x06, 0xD2, 0x76, 0x00, 0x01, 0x24, 0x01];
     let select_openpgp = apdus::create_apdu_select_openpgp();
@@ -114,7 +113,7 @@ pub fn entry(pin: Vec<u8>) {
     //str::from_utf8(&resp[..l]).unwrap()
     //);
     // Now let us try to verify the pin passed to us.
-    //let pin_apdu = apdus::create_apdu_verify_pw1_for_others(pin);
+    //let pin_apdu = apdus::create_apdu_verify_pw1_for_others(_pin);
     //let resp = sendapdu(&card, pin_apdu);
     //let l = resp.len() - 2;
     //println!(

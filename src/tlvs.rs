@@ -1,7 +1,7 @@
 //! This module implements ISO7816 TLV format.
 //!
 
-use std::fmt::{format, UpperHex};
+use std::fmt::UpperHex;
 
 /// A TLV contails the tag, and the length and also the value (data). Our implementation also
 /// contains a special `subs` attritbute, which contains a list of composite DOs.
@@ -81,7 +81,7 @@ impl TLV {
     ///
     /// ```
     /// let sigdata = tlv.get_fingerprints().unwrap();
-    /// let sig_f, dec_f, auth_f = parse_fingerprints(sigdata);
+    /// let (sig_f, dec_f, auth_f) = parse_fingerprints(sigdata);
     /// println!("This card's Signature fingerprint {}", tlvs::hexify(sig_f.iter().cloned().collect()));
     /// ```
     pub fn get_fingerprints(&self) -> Option<Vec<u8>> {
