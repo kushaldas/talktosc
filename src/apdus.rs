@@ -107,7 +107,6 @@ impl APDU {
             data,
             iapdus,
         }
-
     }
 }
 impl<'a> IntoIterator for &'a APDU {
@@ -209,6 +208,11 @@ pub fn create_apdu_get_aid() -> APDU {
 /// Creates a new APDU to get all the Application related data from the card
 pub fn create_apdu_get_application_data() -> APDU {
     APDU::new(0x00, 0xCA, 0x00, 0x6E, None)
+}
+
+/// Creates a new APDU to get all security template information from the card
+pub fn create_apdu_get_security_template() -> APDU {
+    APDU::new(0x00, 0xCA, 0x00, 0x7A, None)
 }
 
 /// Creates new APDU for decryption operation
