@@ -129,6 +129,11 @@ impl TLV {
         let tlv = self.find_tag(0x93)?;
         Some(tlv.v.clone())
     }
+    /// Returns the pin retry details
+    pub fn get_pin_tries(&self) -> Option<Vec<u8>> {
+        let tlv = self.find_tag(0xC4)?;
+        Some(tlv.v.clone())
+    }
 }
 
 /// Internal function to pop a u8 value from the front of the vector.

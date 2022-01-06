@@ -1,12 +1,16 @@
 # talktosc
 
-Small rust crate to do OpenPGP operations on smartcards. In development and the API will keep changing till we reach
-beta release.
+Small rust crate to do OpenPGP operations on smartcards.
 
-This will be used inside of [Johnny Can Encrypt](https://johnnycanencrypt.readthedocs.io/en/latest/) project.
+This is used in [Johnny Can Encrypt](https://johnnycanencrypt.readthedocs.io/en/latest/) project.
 
 ## How to test?
 
 ```
 cargo test --lib
 ```
+
+
+## API Documentation
+
+You can read the documentation at [docs.rs](https://docs.rs/talktosc/latest/talktosc/).
