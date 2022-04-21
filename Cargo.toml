@@ -9,6 +9,9 @@ description = "Library to talk to smartcards for OpenPGP operations."
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[lib]
+doctest = false
+
 [dependencies]
 pcsc = "2.7.0"
 thiserror = "1.0"
