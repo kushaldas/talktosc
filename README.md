@@ -14,3 +14,4 @@ cargo test --lib
 ## API Documentation
 
 You can read the documentation at [docs.rs](https://docs.rs/talktosc/latest/talktosc/).
+
