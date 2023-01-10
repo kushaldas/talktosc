@@ -25,6 +25,9 @@ pub enum TalktoSCError {
     #[error("Error in the response length: {0}")]
     ResponseError(usize),
     /// Pin error
-    #[error("Faied to verify the pin")]
+    #[error("Failed to verify the pin")]
     PinError,
+    /// OTP mode change error
+    #[error("Failed to change OTP mode")]
+    OtpError,
 }

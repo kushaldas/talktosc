@@ -242,6 +242,48 @@ pub fn create_apdu_for_reading(length: u8) -> APDU {
     }
 }
 
+/// Creates Management selection APDU
+pub fn create_apdu_management_selection() -> APDU {
+    APDU::new(
+        0x00,
+        0xA4,
+        0x04,
+        0x00,
+        Some(vec![0xA0, 0x00, 0x00, 0x05, 0x27, 0x47, 0x11, 0x17]),
+    )
+}
+
+/// Creates Management config reading APDU
+pub fn create_apdu_management_read_config() -> APDU {
+    APDU::new(0x00, 0x1D, 0x00, 0x00, None)
+}
+
+/// Creates APDU to enable OTP application
+pub fn create_usb_otp_enable() -> APDU {
+    APDU::new(
+        0x00,
+        0x1C,
+        0x00,
+        0x00,
+        Some(vec![
+            0x0A, 0x0C, 0x00, 0x03, 0x02, 0x02, 0x3B, 0x0E, 0x02, 0x02, 0x3B,
+        ]),
+    )
+}
+
+/// Creates APDU to disable OTP application
+pub fn create_usb_otp_disable() -> APDU {
+    APDU::new(
+        0x00,
+        0x1C,
+        0x00,
+        0x00,
+        Some(vec![
+            0x0A, 0x0C, 0x00, 0x03, 0x02, 0x02, 0x3A, 0x0E, 0x02, 0x02, 0x3B,
+        ]),
+    )
+}
+
 /// Creates big APDU to put algorithm attributes data in to the card
 pub fn create_apdu_for_algo_attributes(data: Vec<u8>) -> APDU {
     APDU::create_big_apdu(0x00, 0xDA, 0x00, 0xC2, data)
