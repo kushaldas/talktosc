@@ -2,7 +2,8 @@
 
 Small rust crate to do OpenPGP operations on smartcards.
 
-This is used in [Johnny Can Encrypt](https://johnnycanencrypt.readthedocs.io/en/latest/) project.
+This is used in [Johnny Can Encrypt](https://johnnycanencrypt.readthedocs.io/en/latest/) and
+[Wecanencrypt](https://docs.rs/wecanencrypt/latest/wecanencrypt/) projects...
 
 ## How to test?
 

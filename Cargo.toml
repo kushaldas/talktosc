@@ -1,6 +1,6 @@
 [package]
 name = "talktosc"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Kushal Das <mail@kushaldas.in>"]
 edition = "2018"
 license = "LGPL-3.0-or-later"
@@ -13,7 +13,7 @@ description = "Library to talk to smartcards for OpenPGP operations."
 doctest = false
 
 [dependencies]
-pcsc = "2.8.0"
+pcsc = "2.9"
 thiserror = "1.0"
 
 # The development profile, used for `cargo build`
